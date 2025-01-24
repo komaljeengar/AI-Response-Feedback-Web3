@@ -4,13 +4,13 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-todolist_addr='f7499d155fdfc2f46c2875d5a2237a97a2a1f459322dfbc052cca06a01977a27'
+RewardContract_addr='f7499d155fdfc2f46c2875d5a2237a97a2a1f459322dfbc052cca06a01977a27'
 
 [dev-addresses]
 
 [dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-framework.git"
-rev = "mainnet"
+rev = "devnet"
 subdir = "aptos-framework"
 
 [dev-dependencies]

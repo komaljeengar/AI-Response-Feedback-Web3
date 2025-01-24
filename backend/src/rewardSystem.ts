@@ -1,14 +1,14 @@
 import FeedbackEvaluator from "./feedbackEvaluator";
-import BlockchainService from "./blockchainService";
+import BlockchainService from './blockchainService'; // Ensure this is correctly imported
 
 class RewardSystem {
     private evaluator: FeedbackEvaluator;
-    private blockchain: BlockchainService;
-    private BASE_REWARD = 10; 
+    private blockchain: BlockchainService; // This will accept a BlockchainService instance
+    private BASE_REWARD = 10;
 
-    constructor() {
+    constructor(blockchainService: BlockchainService) { // Accept the service here
         this.evaluator = new FeedbackEvaluator();
-        this.blockchain = new BlockchainService();
+        this.blockchain = blockchainService; // Use the passed service
     }
 
     async processFeedback(userId: string, feedback: string, rating: number) {
