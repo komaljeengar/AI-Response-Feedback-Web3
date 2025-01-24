@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-RewardContract_addr='f7499d155fdfc2f46c2875d5a2237a97a2a1f459322dfbc052cca06a01977a27'
+RewardContract_addr="0x9d05bcda6351ea6ec4b6a16fc314e0c4d1ffd9124d9ce74185879fe7d2ee5627"
 
 [dev-addresses]
 
