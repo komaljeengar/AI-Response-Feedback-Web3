@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import RatingAndReview from "./RatingAndReview";
-import  getAIResponse  from "../utils/aiUtils.js"; // Import from your utility file
+import  getAIResponse  from "../utils/aiUtils.js"; 
+
 
 const ChatInterface = ({ updateBalance }) => {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showReview, setShowReview] = useState(false);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,6 +17,7 @@ const ChatInterface = ({ updateBalance }) => {
     setShowReview(false); // Hide review section for new question
 
     try {
+      
       const geminiResponse = await getAIResponse(question); // Get response from Gemini API
       setResponse(geminiResponse);
       setShowReview(true); // Show review option after receiving Gemini response

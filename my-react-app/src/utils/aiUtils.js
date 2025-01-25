@@ -1,23 +1,31 @@
 import axios from "axios";
 
 const getAIResponse = async (question) => {
-  const payload = {
-    question, // The question sent to the Gemini API
-  };
+  const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+  const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-  const headers = {
-    "Content-Type": "application/json",
+  if (!API_KEY) {
+    console.error("❌ API Key is missing! Check your .env file.");
+    return "Error: API Key is missing.";
+  }
+
+  const payload = {
+    contents: [{ role: "user", parts: [{ text: question }] }],
   };
-  
 
   try {
-    const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`, payload, { headers });
-    console.log(response)
+    console.log("🔍 Sending request to:", API_URL);
+    console.log("📩 Payload:", JSON.stringify(payload));
 
-    // Return the AI response from the API
-    return response.data.answer || "No response available."; // Adjust based on actual API response structure
+    const response = await axios.post(API_URL, payload, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    console.log("✅ API Response:", response.data);
+
+    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response available.";
   } catch (error) {
-    console.error("Error fetching AI response:", error);
+    console.error("❌ API Error:", error.response?.data || error.message);
     return "Error: Unable to fetch AI response at the moment.";
   }
 };
