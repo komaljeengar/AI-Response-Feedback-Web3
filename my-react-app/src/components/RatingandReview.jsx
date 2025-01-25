@@ -19,13 +19,13 @@ const RatingAndReview = ({ onReviewSubmitted }) => {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">Rating:</label>
-          <div className="flex">
+          <div className="flex_star">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 onClick={() => setRating(star)}
-                className={`text-3xl focus:outline-none ${rating >= star ? "text-yellow-500" : "text-gray-300"}`}
+                className={`text-2xl focus:outline-none ${rating >= star ? "text-yellow-500" : "text-gray-400"}`}
               >
                 ★
               </button>
@@ -33,17 +33,17 @@ const RatingAndReview = ({ onReviewSubmitted }) => {
           </div>
         </div>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Review:</label>
+          <label className="block text-gray-700 border-black text-sm font-bold mb-2">Review:</label>
           <textarea
             value={review}
             onChange={(e) => setReview(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded border-[#D8EFD3] w-full py-2 px-3 bg-white text-black leading-tight focus:outline-none focus:shadow-outline"
             rows={3}
           />
         </div>
         <button
           type="submit"
-          className="flex-shrink-0 bg-[#F7418F] hover:bg-[#F94892] border-[#F7418F] hover:border-[#D14D72] hover:text-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="flex-shrink-0 bg-[#50B498] hover:bg-[#95D2B3] border-[#50B498] hover:border-[#95D2B3] hover:text-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
           Submit Feedback
         </button>

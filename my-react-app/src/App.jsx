@@ -29,7 +29,7 @@ const App = () => {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100">
+      <div className="min-h-screen bg-[#D8EFD3] w-screen">
         <Navbar walletAddress={walletAddress} balance={balance} onConnect={handleConnect} />
         <div className="container mx-auto p-4">
           <Routes>
