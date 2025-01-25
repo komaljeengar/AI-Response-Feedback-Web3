@@ -36,7 +36,7 @@ const ChatInterface = ({ updateBalance }) => {
       <div className="w-full max-w-2xl bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <h2 className="text-2xl font-bold mb-4">AI Chatbot</h2>
         <form onSubmit={handleSubmit} className="mb-4">
-          <div className="flex items-center border-b border-green-500 py-2">
+          <div className="flex items-center border-b border-[#FFABAB] py-2">
             <input
               type="text"
               value={question}
@@ -47,7 +47,7 @@ const ChatInterface = ({ updateBalance }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-shrink-0 bg-green-500 hover:bg-green-700 border-green-500 hover:border-green-700 text-sm border-4 text-white py-1 px-2 rounded"
+              className="flex-shrink-0 bg-[#F7418F] hover:bg-[#F94892] border-[#F7418F] hover:border-[#D14D72] text-sm border-4 text-white py-1 px-2 rounded"
             >
               {isLoading ? "Thinking..." : "Ask"}
             </button>

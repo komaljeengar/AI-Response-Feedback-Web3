@@ -43,7 +43,7 @@ const RatingAndReview = ({ onReviewSubmitted }) => {
         </div>
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="flex-shrink-0 bg-[#F7418F] hover:bg-[#F94892] border-[#F7418F] hover:border-[#D14D72] hover:text-black text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         >
           Submit Feedback
         </button>
