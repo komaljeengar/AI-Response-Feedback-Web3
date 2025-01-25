@@ -1,35 +1,40 @@
-import React, { useState } from "react"
-import { getAIResponse } from "../utils/aiUtils.js"
-import RatingAndReview from "./RatingAndReview"
+import React, { useState } from "react";
+import RatingAndReview from "./RatingAndReview";
+import  getAIResponse  from "../utils/aiUtils.js"; // Import from your utility file
 
 const ChatInterface = ({ updateBalance }) => {
-  const [question, setQuestion] = useState("")
-  const [response, setResponse] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [showReview, setShowReview] = useState(false)
+  const [question, setQuestion] = useState("");
+  const [response, setResponse] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showReview, setShowReview] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
+    setResponse(null); // Reset previous response
+    setShowReview(false); // Hide review section for new question
+
     try {
-      const aiResponse = await getAIResponse(question)
-      setResponse(aiResponse)
-      setShowReview(true)
+      const geminiResponse = await getAIResponse(question); // Get response from Gemini API
+      setResponse(geminiResponse);
+      setShowReview(true); // Show review option after receiving Gemini response
     } catch (error) {
-      console.error("Error getting AI response:", error)
+      console.error("Error getting Gemini response:", error);
+      setResponse("Sorry, there was an error processing your question. Please try again.");
     }
-    setIsLoading(false)
-    setQuestion("")
-  }
+
+    setIsLoading(false);
+    setQuestion(""); // Clear input field after submission
+  };
 
   const handleReviewSubmitted = async () => {
-    // Mock backend verification
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Simulate backend processing for the review submission
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Update balance after successful review
-    await updateBalance()
-    setShowReview(false)
-  }
+    await updateBalance();
+    setShowReview(false); // Hide review form after submission
+  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
@@ -62,8 +67,7 @@ const ChatInterface = ({ updateBalance }) => {
         {showReview && <RatingAndReview onReviewSubmitted={handleReviewSubmitted} />}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ChatInterface
-
+export default ChatInterface;
