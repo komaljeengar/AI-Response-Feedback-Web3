@@ -1,6 +1,14 @@
 import { AptosClient, AptosAccount, Types } from 'aptos';
 import dotenv from 'dotenv';
 
+interface ReviewSubmission {
+    userId: string;
+    reviewText: string;
+    rating: number;
+    score: number;
+    rewardAmount: number;
+}
+
 class BlockchainService {
     private client: AptosClient;
     private adminAccount: AptosAccount;
@@ -27,9 +35,10 @@ class BlockchainService {
         const privateKey = process.env.ADMIN_PRIVATE_KEY;
         
         if (privateKey) {
+            console.log("###", Buffer.from(privateKey, 'utf-8').toString())
             // Use existing private key
             return new AptosAccount(
-                Buffer.from(privateKey, 'hex')
+                Buffer.from(privateKey, 'utf-8')
             );
         } else {
             // Generate new account for testing
@@ -37,21 +46,26 @@ class BlockchainService {
         }
     }
 
-    // Transfer reward tokens
-    async transferReward(
-        recipientAddress: string, 
-        amount: number
-    ): Promise<string> {
+    // Submit review and process reward on blockchain
+    async submitReview(reviewData: ReviewSubmission): Promise<{ 
+        txHash: string, 
+        reviewId: string 
+    }> {
         try {
-            // Payload for reward submission
+            // Generate a unique review ID (could be a hash of review details)
+            const reviewId = this.generateReviewId(reviewData);
+
+            // Payload for review submission
             const payload: Types.TransactionPayload = {
                 type: "entry_function_payload",
                 function: `${this.contractAddress}::submit_review`,
                 type_arguments: [],
                 arguments: [
-                    recipientAddress,  // Recipient wallet
-                    4,                 // Star rating 
-                    amount.toString() // Reward amount
+                    reviewData.userId,          // User who submitted the review
+                    reviewId,                   // Unique review identifier
+                    reviewData.rating,          // Star rating
+                    reviewData.score,           // Quality score
+                    reviewData.rewardAmount.toString() // Reward amount
                 ]
             };
 
@@ -69,11 +83,22 @@ class BlockchainService {
 
             const transactionResult = await this.client.submitTransaction(signedTxn);
 
-            return transactionResult.hash;
+            return { 
+                txHash: transactionResult.hash, 
+                reviewId 
+            };
         } catch (error) {
-            console.error('Blockchain transfer failed:', error);
-            throw new Error('Reward transfer unsuccessful');
+            console.error('Blockchain review submission failed:', error);
+            throw new Error('Review submission unsuccessful');
         }
+    }
+
+    // Generate a unique review ID
+    private generateReviewId(reviewData: ReviewSubmission): string {
+        // Create a hash based on review details to ensure uniqueness
+        const crypto = require('crypto');
+        const reviewString = `${reviewData.userId}-${reviewData.reviewText}-${Date.now()}`;
+        return crypto.createHash('sha256').update(reviewString).digest('hex');
     }
 
     // Validate user's ability to receive rewards

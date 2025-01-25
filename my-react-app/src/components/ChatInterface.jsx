@@ -1,42 +1,57 @@
 import React, { useState } from "react";
 import RatingAndReview from "./RatingAndReview";
-import  getAIResponse  from "../utils/aiUtils.js"; 
-
+import getAIResponse from "../utils/aiUtils.js";
 
 const ChatInterface = ({ updateBalance }) => {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showReview, setShowReview] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
 
-
+  // Handle AI Question Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setResponse(null); // Reset previous response
-    setShowReview(false); // Hide review section for new question
+    setResponse(null);
+    setShowReview(false);
 
     try {
-      
-      const geminiResponse = await getAIResponse(question); // Get response from Gemini API
+      const geminiResponse = await getAIResponse(question);
       setResponse(geminiResponse);
-      setShowReview(true); // Show review option after receiving Gemini response
+      setShowReview(true); // Allow review after response
     } catch (error) {
       console.error("Error getting Gemini response:", error);
-      setResponse("Sorry, there was an error processing your question. Please try again.");
+      setResponse("Sorry, an error occurred. Please try again.");
     }
 
     setIsLoading(false);
-    setQuestion(""); // Clear input field after submission
+    setQuestion("");
   };
 
-  const handleReviewSubmitted = async () => {
-    // Simulate backend processing for the review submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  // Handle Review Submission
+  const handleReviewSubmitted = async (rating, reviewText) => {
+    try {
+      const response = await fetch("http://localhost:5174/submit-review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ rating, review: reviewText }),
+      });
 
-    // Update balance after successful review
-    await updateBalance();
-    setShowReview(false); // Hide review form after submission
+      const data = await response.json();
+      if (data.success) {
+        alert("Review submitted successfully!");
+        await updateBalance(); // Update user balance after transaction
+      } else {
+        alert("Failed to submit review.");
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -67,7 +82,15 @@ const ChatInterface = ({ updateBalance }) => {
             <p className="text-gray-700">{response}</p>
           </div>
         )}
-        {showReview && <RatingAndReview onReviewSubmitted={handleReviewSubmitted} />}
+        {showReview && (
+          <RatingAndReview
+            onReviewSubmitted={handleReviewSubmitted}
+            rating={rating}
+            setRating={setRating}
+            reviewText={reviewText}
+            setReviewText={setReviewText}
+          />
+        )}
       </div>
     </div>
   );

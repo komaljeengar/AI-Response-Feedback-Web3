@@ -1,7 +1,7 @@
-import express, { Request } from 'express';
+import express from 'express';
 import cors from 'cors';
-import BlockchainService from './blockchainService';
-import RewardSystem from './rewardSystem';
+import BlockchainService from './src/blockchainService';
+import RewardSystem from './src/rewardSystem';
 
 const app = express();
 app.use(express.json());
@@ -12,7 +12,7 @@ const blockchainService = new BlockchainService();
 const rewardSystem = new RewardSystem(blockchainService);
 
 // Endpoint to submit reviews and process rewards
-app.post("/submit-review", async (req: Request, res: any ) => {
+app.post("/submit-review", async (req, res) => {
     try {
         const { userId, reviewText, rating } = req.body;
 
