@@ -8,7 +8,7 @@ const Home = () => {
       <p className="text-xl mb-8 text-black">Experience the power of AI and earn rewards for your feedback!</p>
       <Link 
         to="/chat"
-        className="bg-[#F7418F] hover:bg-[#FF8E9E] text-white font-bold py-2 px-4 rounded transition duration-300"
+        className="bg-[#F7418F] hover:bg-[#F94892] hover:text-black text-white font-bold py-2 px-4 rounded transition duration-300"
       >
         Start Chatting
       </Link>

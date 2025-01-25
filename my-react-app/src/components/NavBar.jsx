@@ -13,23 +13,23 @@ const Navbar = ({ walletAddress, balance, onConnect }) => {
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-1">
-              <Link to="/" className="py-4 px-2 text-gray-500 hover:text-green-500 transition duration-300">
+              <Link to="/" className="py-4 px-2 text-gray-500 hover:text-[#FF8E9E] transition duration-300">
                 Home
               </Link>
-              <Link to="/chat" className="py-4 px-2 text-gray-500 hover:text-green-500 transition duration-300">
+              <Link to="/chat" className="py-4 px-2 text-gray-500 hover:text-[#FF8E9E] transition duration-300">
                 AI Chatbot
               </Link>
             </div>
           </div>
           <div className="hidden md:flex items-center space-x-3">
             {walletAddress ? (
-              <div className="py-2 px-2 font-medium text-gray-500 rounded hover:bg-green-500 hover:text-white transition duration-300">
+              <div className="py-2 px-2 font-medium text-gray-500 rounded hover:bg-[#FFABAB] hover:text-white transition duration-300">
                 Balance: {Number.parseFloat(balance).toFixed(2)} APT
               </div>
             ) : (
               <button
                 onClick={onConnect}
-                className="py-2 px-2 font-medium text-white bg-green-500 rounded hover:bg-green-400 transition duration-300"
+                className="py-2 px-2 font-medium text-white bg-[#F7418F] rounded hover:[#F7418F] transition duration-300"
               >
                 Connect Wallet
               </button>
@@ -42,4 +42,3 @@ const Navbar = ({ walletAddress, balance, onConnect }) => {
 }
 
 export default Navbar
-
