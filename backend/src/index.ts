@@ -13,9 +13,10 @@ const rewardSystem = new RewardSystem(blockchainService);
 
 // Endpoint to submit reviews and process rewards
 app.post("/submit-review", async (req: Request, res: any ) => {
+    console.log("Submit review")
     try {
         const { userId, reviewText, rating } = req.body;
-
+  console.log("Submit review", userId, reviewText, rating);
         // Validate input
         if (!userId || !reviewText || !rating) {
             return res.status(400).json({ 
@@ -23,13 +24,14 @@ app.post("/submit-review", async (req: Request, res: any ) => {
                 error: "Missing required fields" 
             });
         }
-
+console.log("working");
         // Process review and potential reward
         const result = await rewardSystem.processFeedback(
             userId, 
             reviewText, 
             rating
         );
+        console.log("Result", result);
 
         // Respond with detailed result
         res.json({

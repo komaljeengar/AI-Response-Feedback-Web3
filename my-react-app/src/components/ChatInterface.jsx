@@ -33,14 +33,21 @@ const ChatInterface = ({ updateBalance }) => {
   // Handle Review Submission
   const handleReviewSubmitted = async (rating, reviewText) => {
     try {
+      const userId = localStorage.getItem("userId"); // Retrieve userId from local storage
+  
+      if (!userId) {
+        alert("Please connect your wallet first.");
+        return;
+      }
+  
       const response = await fetch("http://localhost:5174/submit-review", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ rating, review: reviewText }),
+        body: JSON.stringify({ userId, rating, reviewText }), // Ensure correct JSON keys
       });
-
+  
       const data = await response.json();
       if (data.success) {
         alert("Review submitted successfully!");
@@ -53,6 +60,7 @@ const ChatInterface = ({ updateBalance }) => {
       alert("An error occurred. Please try again.");
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">

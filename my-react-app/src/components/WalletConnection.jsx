@@ -3,10 +3,19 @@ import React, { useState } from "react";
 const WalletButton = ({ connectWallet }) => {
   const [loading, setLoading] = useState(false);
 
+
   const handleClick = async () => {
     try {
       setLoading(true);
-      await connectWallet();
+      const { address } = await connectWallet(); // Get address from connectWallet
+      
+      if (address) {
+        localStorage.setItem("userId", address); // Store userId in local storage
+        console.log(localStorage.getItem("userId"));
+        alert("Wallet connected successfully!");
+      } else {
+        throw new Error("Failed to retrieve wallet address.");
+      }
     } catch (error) {
       console.error("Error connecting wallet:", error);
       alert("Failed to connect to Petra Wallet. Please try again.");
@@ -14,6 +23,8 @@ const WalletButton = ({ connectWallet }) => {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <button

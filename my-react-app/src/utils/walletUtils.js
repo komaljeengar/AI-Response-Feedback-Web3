@@ -9,7 +9,12 @@ export const connectWallet = async () => {
   if (window.aptos) {
     try {
       const account = await window.aptos.connect(); // Connect to Petra Wallet
-      return { address: account.address };
+      if (account && account.address) {
+        localStorage.setItem("userId", account.address); // Store userId in local storage
+        return { address: account.address };
+      } else {
+        throw new Error("Failed to retrieve wallet address.");
+      }
     } catch (error) {
       console.error("Error connecting to wallet:", error);
       throw new Error("Failed to connect wallet");
@@ -19,6 +24,7 @@ export const connectWallet = async () => {
     throw new Error("Petra Wallet not installed");
   }
 };
+
 
 // Function to get the balance of the connected wallet
 export const getBalance = async (address) => {

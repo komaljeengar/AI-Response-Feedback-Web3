@@ -8,7 +8,7 @@ const RatingAndReview = ({ onReviewSubmitted }) => {
     e.preventDefault()
     // Here you would typically send the rating and review to your backend
     console.log("Submitting review:", { rating, review })
-    await onReviewSubmitted()
+    await onReviewSubmitted(rating, review)
     setRating(0)
     setReview("")
   }
