@@ -1,56 +1,67 @@
-import React, { useState } from "react"
+import { Star } from "lucide-react";
 
-const RatingAndReview = ({ onReviewSubmitted }) => {
-  const [rating, setRating] = useState(0)
-  const [review, setReview] = useState("")
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    // Here you would typically send the rating and review to your backend
-    console.log("Submitting review:", { rating, review })
-    await onReviewSubmitted(rating, review)
-    setRating(0)
-    setReview("")
-  }
+const RatingAndReview = ({
+  onReviewSubmitted,
+  rating,
+  setRating,
+  reviewText,
+  setReviewText,
+  darkMode
+}) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onReviewSubmitted(rating, reviewText);
+    setRating(0);
+    setReviewText("");
+  };
 
   return (
-    <div className="mt-4">
-      <h3 className="text-xl font-bold mb-2">Provide Feedback</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Rating:</label>
-          <div className="flex">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => setRating(star)}
-                className={`text-3xl focus:outline-none ${rating >= star ? "text-yellow-500" : "text-gray-300"}`}
-              >
-                ★
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Review:</label>
-          <textarea
-            value={review}
-            onChange={(e) => setReview(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            rows={3}
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Submit Feedback
-        </button>
-      </form>
+    <div className={`${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+      <h3 className="text-lg font-semibold mb-4">Rate this response</h3>
+
+      {/* Star Rating */}
+      <div className="flex items-center gap-1 mb-4">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => setRating(star)}
+            className={`p-1 transition-colors duration-200 ${star <= rating
+                ? 'text-yellow-400'
+                : darkMode ? 'text-gray-600' : 'text-gray-300'
+              }`}
+          >
+            <Star className="w-6 h-6 space-x-6 fill-current" />
+          </button>
+        ))}
+      </div>
+
+      {/* Review Text */}
+      <textarea
+        value={reviewText}
+        onChange={(e) => setReviewText(e.target.value)}
+        placeholder="Share your feedback..."
+        className={`w-full p-3 rounded-lg mb-4 ${darkMode
+            ? 'bg-gray-700 text-white placeholder-gray-400'
+            : 'bg-white text-gray-900 placeholder-gray-500'
+          } border ${darkMode ? 'border-gray-600' : 'border-gray-300'
+          } focus:outline-none focus:ring-2 ${darkMode ? 'focus:ring-blue-500' : 'focus:ring-green-500'
+          }`}
+        rows="3"
+      />
+
+      {/* Submit Button */}
+      <button
+        onClick={handleSubmit}
+        disabled={!rating || !reviewText.trim()}
+        className={`w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 ${darkMode
+            ? 'bg-blue-600 hover:bg-blue-500 text-white disabled:bg-gray-600'
+            : 'bg-green-500 hover:bg-green-600 text-white disabled:bg-gray-300'
+          } disabled:cursor-not-allowed`}
+      >
+        Submit Review
+      </button>
     </div>
-  )
-}
+  );
+};
 
-export default RatingAndReview
-
+export default RatingAndReview;

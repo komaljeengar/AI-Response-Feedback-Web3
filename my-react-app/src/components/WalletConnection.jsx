@@ -41,4 +41,3 @@ const WalletButton = ({ connectWallet }) => {
 };
 
 export default WalletButton;
-

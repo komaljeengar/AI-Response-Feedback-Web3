@@ -1,45 +1,36 @@
-import React from "react"
-import { Link } from "react-router-dom"
-
-const Navbar = ({ walletAddress, balance, onConnect }) => {
+const Navbar = ({ walletAddress, balance, onConnect, darkMode }) => {
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between">
-          <div className="flex space-x-7">
-            <div>
-              <Link to="/" className="flex items-center py-4 px-2">
-                <span className="font-semibold text-gray-500 text-lg">AI Chat Review</span>
-              </Link>
-            </div>
-            <div className="hidden md:flex items-center space-x-1">
-              <Link to="/" className="py-4 px-2 text-gray-500 hover:text-green-500 transition duration-300">
-                Home
-              </Link>
-              <Link to="/chat" className="py-4 px-2 text-gray-500 hover:text-green-500 transition duration-300">
-                AI Chatbot
-              </Link>
-            </div>
-          </div>
-          <div className="hidden md:flex items-center space-x-3">
-            {walletAddress ? (
-              <div className="py-2 px-2 font-medium text-gray-500 rounded hover:bg-green-500 hover:text-white transition duration-300">
-                Balance: {Number.parseFloat(balance).toFixed(2)} APT
-              </div>
-            ) : (
-              <button
-                onClick={onConnect}
-                className="py-2 px-2 font-medium text-white bg-green-500 rounded hover:bg-green-400 transition duration-300"
-              >
-                Connect Wallet
-              </button>
-            )}
-          </div>
+    <div className="flex items-center space-x-3">
+      {walletAddress ? (
+        <div className={`
+          py-2 px-4 rounded-lg font-medium 
+          ${darkMode
+            ? 'bg-gray-700 text-gray-300 border border-gray-600'
+            : 'bg-white text-gray-700 border border-gray-200'
+          }
+        `}>
+          <span className="hidden sm:inline mr-2">Balance:</span>
+          <span className="font-mono">
+            {Number.parseFloat(balance).toFixed(2)} APT
+          </span>
         </div>
-      </div>
-    </nav>
+      ) : (
+        <button
+          onClick={onConnect}
+          className={`
+            py-2 px-4 rounded-lg font-medium
+            transition-colors duration-300
+            ${darkMode
+              ? 'bg-green-600 hover:bg-green-500 text-white'
+              : 'bg-blue-500 hover:bg-blue-400 text-white'
+            }
+          `}
+        >
+          Connect Wallet
+        </button>
+      )}
+    </div>
   )
 }
 
 export default Navbar
-
