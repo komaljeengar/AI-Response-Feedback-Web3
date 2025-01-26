@@ -13,10 +13,10 @@ const rewardSystem = new RewardSystem(blockchainService);
 
 // Endpoint to submit reviews and process rewards
 app.post("/submit-review", async (req: Request, res: any ) => {
-    console.log("Submit review")
+    console.log("Submit review") 
     try {
         const { userId, reviewText, rating } = req.body;
-  console.log("Submit review", userId, reviewText, rating);
+
         // Validate input
         if (!userId || !reviewText || !rating) {
             return res.status(400).json({ 
@@ -24,14 +24,13 @@ app.post("/submit-review", async (req: Request, res: any ) => {
                 error: "Missing required fields" 
             });
         }
-console.log("working");
+
         // Process review and potential reward
         const result = await rewardSystem.processFeedback(
             userId, 
             reviewText, 
             rating
         );
-        console.log("Result", result);
 
         // Respond with detailed result
         res.json({
@@ -51,22 +50,7 @@ console.log("working");
     }
 });
 
-// Endpoint to get reward configuration
-app.get("/reward-config", async (req, res) => {
-    try {
-        const config = await blockchainService.getRewardConfiguration();
-        res.json({
-            success: true,
-            configuration: config
-        });
-    } catch (error) {
-        console.error("Error fetching reward config:", error);
-        res.status(500).json({ 
-            success: false, 
-            error: "Could not retrieve reward configuration" 
-        });
-    }
-});
+// Removed the "/reward-config" endpoint as it's not in the current BlockchainService
 
 // Start the server
 const PORT = process.env.PORT || 5174;
@@ -75,3 +59,24 @@ app.listen(PORT, () => {
 });
 
 export default app;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

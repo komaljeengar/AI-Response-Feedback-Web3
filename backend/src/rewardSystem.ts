@@ -3,22 +3,20 @@ import BlockchainService from './blockchainService';
 
 class RewardSystem {
     private evaluator: FeedbackEvaluator;
-    private blockchain: BlockchainService; // This will accept a BlockchainService instance
+    private blockchain: BlockchainService;
     private BASE_REWARD = 10;
-    private MIN_SCORE_FOR_REWARD = 30; // Minimum score to qualify for reward
+    private MIN_SCORE_FOR_REWARD = 30;
 
-
-    constructor(blockchainService: BlockchainService) { // Accept the service here
+    constructor(blockchainService: BlockchainService) {
         this.evaluator = new FeedbackEvaluator();
-        this.blockchain = blockchainService; // Use the passed service
+        this.blockchain = blockchainService;
     }
 
     async processFeedback(
         userId: string, 
         feedback: string, 
         rating: number
-    ) 
-    {
+    ) {
         try {
             // Step 1: Evaluate Feedback Quality
             const evaluationResult = this.evaluator.evaluateFeedback(feedback);
@@ -35,16 +33,9 @@ class RewardSystem {
             // Step 3: Calculate Reward Amount
             const rewardAmount = this.calculateReward(evaluationResult);
 
-            // Step 4: Validate User Eligibility
-            const userEligible = await this.blockchain.validateUserEligibility(userId);
-            if (!userEligible) {
-                return { 
-                    awarded: false, 
-                    reason: "User not eligible for rewards" 
-                };
-            }
+            // Note: Removed validateUserEligibility as it's not in the current BlockchainService
 
-            // Step 5: Prepare Review Submission Data
+            // Step 4: Prepare Review Submission Data
             const reviewSubmission = {
                 userId,
                 reviewText: feedback,
@@ -53,7 +44,7 @@ class RewardSystem {
                 rewardAmount
             };
 
-            // Step 6: Submit Review and Transfer Reward on Blockchain
+            // Step 5: Submit Review and Transfer Reward on Blockchain
             const result = await this.blockchain.submitReview(reviewSubmission);
 
             return { 

@@ -1,5 +1,6 @@
 import { AptosClient, AptosAccount, Types } from 'aptos';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 
 interface ReviewSubmission {
     userId: string;
@@ -34,56 +35,69 @@ class BlockchainService {
 
     // Load admin account for transactions
     private loadAdminAccount(): AptosAccount {
-        const privateKey = process.env.ADMIN_PRIVATE_KEY;
+        const privateKey="0x3071753432b664085977a8471d3cac4b782bdfc8429a5fe805657de7e6f19f1e";
         
         if (privateKey) {
-            // Use existing private key
-            return new AptosAccount(
-                Buffer.from(privateKey, 'hex') // Assuming hex-encoded private key
-            );
+            return new AptosAccount(Uint8Array.from(Buffer.from(privateKey, 'ascii')));
         } else {
-            // Generate new account for testing
             return new AptosAccount();
         }
     }
 
-    // Submit review with token reward
+    async transferCustomToken(
+        sender: AptosAccount, 
+        recipient: string, 
+        amount: number 
+    ) {
+        const payload: Types.TransactionPayload = {
+            type: "entry_function_payload",
+            function: `${this.TOKEN_ADDRESS}::token::transfer`,
+            type_arguments: [this.TOKEN_TYPE],
+            arguments: [
+                recipient,
+                (amount * 90_000_000).toString()
+            ]
+        };
+
+        // Generate and submit transaction
+        const transaction = await this.client.generateTransaction(
+            sender.address(), 
+            payload
+        );
+        
+        const signedTx = await this.client.signTransaction(sender, transaction);
+        return await this.client.submitTransaction(signedTx);
+    }
+
     async submitReview(reviewData: ReviewSubmission): Promise<{ 
         txHash: string, 
         reviewId: string 
     }> {
         try {
-            // Generate a unique review ID
             const reviewId = this.generateReviewId(reviewData);
-
-            // Prepare token transfer payload
+            
             const payload: Types.TransactionPayload = {
                 type: "entry_function_payload",
                 function: `${this.TOKEN_ADDRESS}::token::transfer`,
                 type_arguments: [this.TOKEN_TYPE],
                 arguments: [
-                    reviewData.userId, // Recipient address
-                    (reviewData.rewardAmount * 1_000_000).toString() // Convert to smallest unit (assuming 6 decimals)
+                    reviewData.userId, 
+                    (reviewData.rewardAmount * 90_000_000).toString()
                 ]
             };
 
-            // Generate the transaction
             const transaction = await this.client.generateTransaction(
                 this.adminAccount.address(),
                 payload
             );
 
-            // Sign the transaction
             const signedTx = await this.client.signTransaction(this.adminAccount, transaction);
-
-            // Submit the transaction
             const pendingTransaction = await this.client.submitTransaction(signedTx);
-            const txHash = pendingTransaction.hash;
 
-            console.log(`Review reward transferred. TX Hash: ${txHash}`);
+            console.log(`Review reward transferred. TX Hash: ${pendingTransaction.hash}`);
 
             return { 
-                txHash: txHash, 
+                txHash: pendingTransaction.hash, 
                 reviewId 
             };
         } catch (error) {
@@ -92,20 +106,15 @@ class BlockchainService {
         }
     }
 
-    // Fetch token balance for a user
     async getTokenBalance(userAddress: string): Promise<number> {
         try {
-            // Construct view request to get token balance
             const payload: Types.ViewRequest = {
                 function: `${this.TOKEN_ADDRESS}::token::balance_of`,
                 type_arguments: [this.TOKEN_TYPE],
                 arguments: [userAddress]
             };
 
-            // Execute view function to get balance
             const [balance] = await this.client.view(payload);
-
-            // Convert balance from smallest unit (e.g., 1_000_000 = 1 token)
             return Number(balance) / 1_000_000;
         } catch (error) {
             console.error('Error fetching token balance:', error);
@@ -113,9 +122,7 @@ class BlockchainService {
         }
     }
 
-    // Generate a unique review ID
     private generateReviewId(reviewData: ReviewSubmission): string {
-        const crypto = require('crypto');
         const reviewString = `${reviewData.userId}-${reviewData.reviewText}-${Date.now()}`;
         return crypto.createHash('sha256').update(reviewString).digest('hex');
     }

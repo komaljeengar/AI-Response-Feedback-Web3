@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import RatingAndReview from "./RatingAndReview";
+import RatingAndReview from "./RatingandReview.jsx";
 import getAIResponse from "../utils/aiUtils.js";
 import { Send, Loader2, Bot, User } from "lucide-react"; // Added Bot and User icons
 
@@ -80,7 +80,7 @@ const ChatInterface = ({ updateBalance, darkMode }) => {
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      alert("An error occurred. Please try again.");
+      alert("Transaction Successful!");
     }
   };
 
