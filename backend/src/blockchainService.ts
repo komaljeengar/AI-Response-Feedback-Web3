@@ -12,7 +12,8 @@ interface ReviewSubmission {
 class BlockchainService {
     private client: AptosClient;
     private adminAccount: AptosAccount;
-    private contractAddress: string;
+    private TOKEN_ADDRESS: string; // Address of the custom token contract
+    private TOKEN_TYPE: string;    // Full type of the token
 
     constructor() {
         // Load environment variables
@@ -23,22 +24,22 @@ class BlockchainService {
             process.env.APTOS_NETWORK_URL || 'https://fullnode.testnet.aptoslabs.com/v1'
         );
 
-        // Create or load admin account for transactions
+        // Load admin account and token details
         this.adminAccount = this.loadAdminAccount();
         
-        // Smart contract address (deployed review rewards contract)
-        this.contractAddress = process.env.REVIEW_REWARDS_CONTRACT || '';
+        // Load token contract details from environment
+        this.TOKEN_ADDRESS = process.env.CUSTOM_TOKEN_CONTRACT_ADDRESS || '';
+        this.TOKEN_TYPE = process.env.CUSTOM_TOKEN_TYPE || '';
     }
 
-    // Load or generate admin account
+    // Load admin account for transactions
     private loadAdminAccount(): AptosAccount {
         const privateKey = process.env.ADMIN_PRIVATE_KEY;
         
         if (privateKey) {
-            console.log("###", Buffer.from(privateKey, 'utf-8').toString())
             // Use existing private key
             return new AptosAccount(
-                Buffer.from(privateKey, 'utf-8')
+                Buffer.from(privateKey, 'hex') // Assuming hex-encoded private key
             );
         } else {
             // Generate new account for testing
@@ -46,103 +47,77 @@ class BlockchainService {
         }
     }
 
-    // Submit review and process reward on blockchain
+    // Submit review with token reward
     async submitReview(reviewData: ReviewSubmission): Promise<{ 
         txHash: string, 
         reviewId: string 
     }> {
         try {
-            // Generate a unique review ID (could be a hash of review details)
+            // Generate a unique review ID
             const reviewId = this.generateReviewId(reviewData);
 
-            // Payload for review submission
+            // Prepare token transfer payload
             const payload: Types.TransactionPayload = {
                 type: "entry_function_payload",
-                function: `${this.contractAddress}::submit_review`,
-                type_arguments: [],
+                function: `${this.TOKEN_ADDRESS}::token::transfer`,
+                type_arguments: [this.TOKEN_TYPE],
                 arguments: [
-                    reviewData.userId,          // User who submitted the review
-                    reviewId,                   // Unique review identifier
-                    reviewData.rating,          // Star rating
-                    reviewData.score,           // Quality score
-                    reviewData.rewardAmount.toString() // Reward amount
+                    reviewData.userId, // Recipient address
+                    (reviewData.rewardAmount * 1_000_000).toString() // Convert to smallest unit (assuming 6 decimals)
                 ]
             };
 
-            // Submit transaction
-            const txn = await this.client.generateTransaction(
+            // Generate the transaction
+            const transaction = await this.client.generateTransaction(
                 this.adminAccount.address(),
                 payload
             );
 
-            // Sign and submit transaction
-            const signedTxn = await this.client.signTransaction(
-                this.adminAccount, 
-                txn
-            );
+            // Sign the transaction
+            const signedTx = await this.client.signTransaction(this.adminAccount, transaction);
 
-            const transactionResult = await this.client.submitTransaction(signedTxn);
+            // Submit the transaction
+            const pendingTransaction = await this.client.submitTransaction(signedTx);
+            const txHash = pendingTransaction.hash;
+
+            console.log(`Review reward transferred. TX Hash: ${txHash}`);
 
             return { 
-                txHash: transactionResult.hash, 
+                txHash: txHash, 
                 reviewId 
             };
         } catch (error) {
-            console.error('Blockchain review submission failed:', error);
-            throw new Error('Review submission unsuccessful');
+            console.error('Token transfer for review failed:', error);
+            throw new Error('Review reward transfer unsuccessful');
+        }
+    }
+
+    // Fetch token balance for a user
+    async getTokenBalance(userAddress: string): Promise<number> {
+        try {
+            // Construct view request to get token balance
+            const payload: Types.ViewRequest = {
+                function: `${this.TOKEN_ADDRESS}::token::balance_of`,
+                type_arguments: [this.TOKEN_TYPE],
+                arguments: [userAddress]
+            };
+
+            // Execute view function to get balance
+            const [balance] = await this.client.view(payload);
+
+            // Convert balance from smallest unit (e.g., 1_000_000 = 1 token)
+            return Number(balance) / 1_000_000;
+        } catch (error) {
+            console.error('Error fetching token balance:', error);
+            return 0;
         }
     }
 
     // Generate a unique review ID
     private generateReviewId(reviewData: ReviewSubmission): string {
-        // Create a hash based on review details to ensure uniqueness
         const crypto = require('crypto');
         const reviewString = `${reviewData.userId}-${reviewData.reviewText}-${Date.now()}`;
         return crypto.createHash('sha256').update(reviewString).digest('hex');
-    }
-
-    // Validate user's ability to receive rewards
-    async validateUserEligibility(
-        userAddress: string
-    ): Promise<boolean> {
-        try {
-            // Check user's previous reward history
-            const payload: Types.ViewRequest = {
-                function: `${this.contractAddress}::check_user_eligibility`,
-                type_arguments: [],
-                arguments: [userAddress]
-            };
-
-            const result = await this.client.view(payload);
-            
-            // Assuming view function returns a boolean
-            return result[0] as boolean;
-        } catch (error) {
-            console.error('Eligibility check failed:', error);
-            return false;
-        }
-    }
-
-    // Get current reward configuration
-    async getRewardConfiguration() {
-        try {
-            const payload: Types.ViewRequest = {
-                function: `${this.contractAddress}::get_reward_config`,
-                type_arguments: [],
-                arguments: []
-            };
-
-            const result = await this.client.view(payload);
-            
-            return {
-                minStars: result[0],
-                baseReward: result[1],
-                totalMinted: result[2]
-            };
-        } catch (error) {
-            console.error('Failed to fetch reward config:', error);
-            return null;
-        }
     }
 }
 

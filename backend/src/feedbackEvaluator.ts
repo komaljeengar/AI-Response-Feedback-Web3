@@ -37,9 +37,9 @@ class FeedbackEvaluator {
     private assessLength(feedback: string): number {
         const words = this.tokenizer.tokenize(feedback);
         console.log("Word Count: ", words.length);
-        // Ensure length is within the desired range (30-200 words)
-        return words.length >= 30 && words.length <= 200 ? 
-            this.normalizeScore(words.length, 30, 200) : 0;
+        // Ensure length is within the desired range (10-200 words)
+        return words.length >= 10 && words.length <= 200 ? 
+            this.normalizeScore(words.length, 10, 200) : 0;
     }
 
     private normalizeScore(value: number, min: number, max: number): number {
@@ -73,7 +73,7 @@ class FeedbackEvaluator {
         const spamSignals = [
             /^(lol|nice|good|ok)$/i.test(feedback),
             feedback.split(' ').some(word => word.repeat(3) === word),
-            feedback.length < 20
+            feedback.length < 10
         ];
 
         console.log("Spam Signals: ", spamSignals);

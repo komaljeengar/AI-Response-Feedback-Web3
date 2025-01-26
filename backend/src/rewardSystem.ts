@@ -5,7 +5,7 @@ class RewardSystem {
     private evaluator: FeedbackEvaluator;
     private blockchain: BlockchainService; // This will accept a BlockchainService instance
     private BASE_REWARD = 10;
-    private MIN_SCORE_FOR_REWARD = 60; // Minimum score to qualify for reward
+    private MIN_SCORE_FOR_REWARD = 30; // Minimum score to qualify for reward
 
 
     constructor(blockchainService: BlockchainService) { // Accept the service here
